@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  auto-save-cull:
+    image: asc
+    environment:
+      CONVERGENCE_API_KEY: ""
+      OT_SERVER_URL: ""
+      USER_DATA_BASE_PATH: "./data"
+      REDIS_HOST: "127.0.0.1"
+      REDIS_PORT: "6379"
+      AUTOSAVE_INTERVAL: 4 # In secs
+      AUTOCULL_INTERVAL: 10 # In secs (60*5)
+      DOCKER_SOCKET: "/var/run/docker.sock"
+    command: node app
+    network_mode: host
+    volumes:
+    - ./data:/worker/data
+    - /var/run/docker.sock:/var/run/docker.sock
