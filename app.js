@@ -5,7 +5,7 @@ const redisQueue = require("./helpers/redisQueue")
 const {sleep} = require('./helpers/utils')
 
 const save = require('./autoSave')
-const cull = require('./autoCull')
+const AutoCull = require('./autoCull')
 
 
 const saveQueueName = "auto-save-queue"
@@ -36,12 +36,18 @@ const startAutoSave = async ()=>{
             await sleep((parseInt(process.env.AUTOSAVE_INTERVAL) - timeDelta)*1000)
 
         await save(task.roomId)
-        await redisQueue.push(saveQueueName, {roomId: task.roomId, timestamp: new Date().toISOString()})
+        await redisQueue.push(saveQueueName, {
+            roomId: task.roomId,
+            timestamp: new Date().toISOString()
+        })
     }
 }
 
 const startAutoCull = async ()=>{
-    console.log("Started auto-cull")
+    console.log("Starting auto-cull")
+    const autoCull = new AutoCull()
+    await autoCull.connect()
+
     while(true){
         const task = JSON.parse(`${await redisQueue.pop(cullQueueName)}`)
         if(!task) {
@@ -53,8 +59,13 @@ const startAutoCull = async ()=>{
         if(parseInt(process.env.AUTOCULL_INTERVAL) > timeDelta)
             await sleep((parseInt(process.env.AUTOCULL_INTERVAL) - timeDelta)*1000)
 
-        await cull(task.roomId)
-        await redisQueue.push(cullQueueName, {roomId: task.roomId, timestamp: new Date().toISOString()})
+        const {shouldCull, isRunning} = await autoCull.checkAndCull(task.roomId, task.shouldCull)
+        if(isRunning)
+            await redisQueue.push(cullQueueName, {
+                roomId: task.roomId,
+                shouldCull,
+                timestamp: new Date().toISOString()
+            })
     }
 }
 
