@@ -1,7 +1,7 @@
 if(!process.env.PROD)
     require('dotenv').config()
 
-const redisQueue = require("./helpers/redis")
+const redisQueue = require("./helpers/redisQueue")
 const {sleep} = require('./helpers/utils')
 
 const save = require('./autoSave')
@@ -12,7 +12,9 @@ const saveQueueName = "auto-save-queue"
 const cullQueueName = "auto-cull-queue"
 
 async function run(){
+    console.log("Connecting to redis...")
     await redisQueue.connect()
+    console.log("Done")
 
     // Autosave
     startAutoSave().then()

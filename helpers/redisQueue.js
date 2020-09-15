@@ -1,5 +1,4 @@
-const redis = require("helpers/redis")
-const promisify = require("util").promisify
+const redis = require("redis")
 
 let redisClient;
 module.exports.connect = async ()=>{
@@ -9,7 +8,7 @@ module.exports.connect = async ()=>{
     });
 
     redisClient.on("connect", (err) => {
-        // console.info("connected to redis");
+        // console.info("connected to redisQueue");
     });
     redisClient.on("ready", (err) => {
         // redisNotReady = false;
