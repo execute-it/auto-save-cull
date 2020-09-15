@@ -11,7 +11,9 @@ const config = {
 
 async function autoSave(projectId) {
     const res = await axios.get(`${process.env.OT_SERVER_URL}/rest/domains/convergence/default/models/${projectId}`, config)
-    saveRec(res.data.body.data.tree, projectId, "root")
+    if(!fs.existsSync(`${process.env.USER_DATA_BASE_PATH}/${projectId}`))
+        fs.mkdirSync(`${process.env.USER_DATA_BASE_PATH}/${projectId}`)
+    saveRec(res.data.body.data["tree"], projectId, "root")
 }
 
 async function saveRec(dataTree, projectId, dir){
@@ -23,7 +25,7 @@ async function saveRec(dataTree, projectId, dir){
         // If data has content, it's a file so save it, else call saveRec recursively
         // TODO: verify recursive working, currently works for all files in root directory
         if(fileRes.data.body.data.content)
-            fs.writeFile(`${process.env.USER_DATA_BASE_PATH}/${projectId}/${filename}`, fileRes.data.body.data.content+"\n", (err, data)=>{
+            fs.writeFile(`${process.env.USER_DATA_BASE_PATH}/${projectId}/${filename}`, fileRes.data.body.data.content+"\n", (err)=>{
                 if(err)
                     console.log(err)
             })

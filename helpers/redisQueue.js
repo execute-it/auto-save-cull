@@ -48,3 +48,18 @@ module.exports.pop = async (queue)=>{
         })
     })
 }
+
+module.exports.exists = async (queue, roomId) => {
+    return new Promise(async (resolve, rej)=>{
+        await redisClient.lrange(queue, 0, -1, (err, data)=>{
+            if(err)
+                rej(err)
+            else {
+                for(let i=0;i<data.length;i++)
+                    if(JSON.parse(data[i]).roomId === roomId)
+                        resolve(true)
+                resolve(false)
+            }
+        })
+    })
+}
