@@ -4,7 +4,7 @@ if(!process.env.PROD)
 const redisQueue = require("./helpers/redisQueue")
 const {sleep} = require('./helpers/utils')
 
-const save = require('./autoSave')
+const AutoSaver = require('./autoSave')
 const AutoCull = require('./autoCull')
 
 
@@ -17,13 +17,18 @@ async function run(){
     console.log("Done")
 
     // Autosave
-    startAutoSave().then()
+    if(!process.env.AUTO_SAVE_OFF)
+        startAutoSave().then()
     // Auto-cull
-    startAutoCull().then()
+    if(!process.env.AUTO_CULL_OFF)
+        startAutoCull().then()
 }
 
 const startAutoSave = async ()=>{
     console.log("Started auto-save")
+    const autoSaver = new AutoSaver()
+    await autoSaver.generateToken()
+
     while(true){
         const task = JSON.parse(`${await redisQueue.pop(saveQueueName)}`)
         if(!task) {
@@ -35,7 +40,7 @@ const startAutoSave = async ()=>{
         if(parseInt(process.env.AUTOSAVE_INTERVAL) > timeDelta)
             await sleep((parseInt(process.env.AUTOSAVE_INTERVAL) - timeDelta)*1000)
 
-        await save(task.roomId)
+        await autoSaver.save(task.roomId)
         if(await redisQueue.exists(cullQueueName, task.roomId))
             await redisQueue.push(saveQueueName, {
                 roomId: task.roomId,
