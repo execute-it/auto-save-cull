@@ -44,6 +44,7 @@ class AutoCull {
             shouldCull = true
             return {shouldCull, isRunning: true};
         }
+        return {shouldCull: false, isRunning: true}
     }
 }
 
