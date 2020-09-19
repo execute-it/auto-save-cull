@@ -41,7 +41,7 @@ const startAutoSave = async ()=>{
             await sleep((parseInt(process.env.AUTOSAVE_INTERVAL) - timeDelta)*1000)
 
         await autoSaver.save(task.roomId)
-        if(await redisQueue.exists(cullQueueName, task.roomId))
+        if(await redisQueue.get(task.roomId))
             await redisQueue.push(saveQueueName, {
                 roomId: task.roomId,
                 timestamp: new Date().toISOString()
@@ -72,6 +72,8 @@ const startAutoCull = async ()=>{
                 shouldCull,
                 timestamp: new Date().toISOString()
             })
+        else
+            await redisQueue.del(task.roomId)
     }
 }
 
