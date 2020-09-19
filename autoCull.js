@@ -31,9 +31,10 @@ class AutoCull {
             // Cull
             try{
                 await stopAndRemoveContainer(roomId)
+                console.log(`AutoCull : Container ${roomId} culled due to inactivity`)
             } catch (e) {
                 if(JSON.parse(e).code === 404)
-                    console.log("Container does not exist, assuming it has crashed")
+                    console.warn("Container does not exist, assuming it has crashed")
                 else
                     console.error(e)
             }
@@ -42,6 +43,7 @@ class AutoCull {
         if (participantsCount===0) {
             // Cull in next iteration
             shouldCull = true
+            console.log(`AutoCull : Container ${roomId} added to cull in next iteration`)
             return {shouldCull, isRunning: true};
         }
         return {shouldCull: false, isRunning: true}

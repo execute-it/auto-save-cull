@@ -69,7 +69,7 @@ class autoSaver {
                 }
             }
             const filename = dataTree.nodes[file].name
-            console.log(file)
+            console.log(`AutoSave : Saved file ${projectId}/${filename}`)
             // If data has children, it's a folder so call saveRec recursively else save file
             // TODO: verify recursive working, currently works for all files in root directory
             if (fileRes.data.body.data.children) {
