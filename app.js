@@ -8,8 +8,8 @@ const AutoSaver = require('./autoSave')
 const AutoCull = require('./autoCull')
 
 
-const saveQueueName = "auto-save-queue"
-const cullQueueName = "auto-cull-queue"
+const saveQueueName = process.env.AUTO_SAVE_QUEUE || "auto-save-queue"
+const cullQueueName = process.env.AUTO_CULL_QUEUE || "auto-cull-queue"
 
 async function run(){
     console.log("Connecting to redis...")
